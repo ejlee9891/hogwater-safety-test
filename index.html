@@ -359,7 +359,7 @@
         </button>
       </div>
     </div>
-    <button class="btn" onclick="location.reload()">다시 하기</button>
+    <button class="btn" onclick="restart()">다시 하기</button>
   </section>
 
 </div>
@@ -616,6 +616,9 @@ loadCount();
     setTimeout(function(){ mo.disconnect(); }, 15000);
   }catch(e){}
 })();
+
+/* 다시 하기: ?type= 등 쿼리 제거하고 깨끗한 메인으로 */
+function restart(){ location.href = location.origin + location.pathname; }
 
 /* ================= 공유 ================= */
 // 현재 화면에 맞는 공유 URL: 결과 화면이면 ?type=유형 붙임
