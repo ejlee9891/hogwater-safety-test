@@ -4,19 +4,18 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>안전 유형 테스트</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/static/pretendard.css" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Do+Hyeon&family=Black+Han+Sans&family=Gugi&family=Gamja+Flower&family=Dongle:wght@700&display=swap" />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/static/pretendard.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap" />
 <style>
-  @font-face{font-family:'NeoDunggeunmo'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Neodgm.woff') format('woff'); font-display:swap;}
   :root{
     --sea:#8fe3ea; --sea-deep:#3aa7b8; --navy:#243a63; --cream:#fdf6e3;
     --coral:#ff7a6b; --gold:#ffd257; --ink:#2a2f45; --panel:#ffffff;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
-  /* Netlify 무료 플랜 배지 숨김 */
-  .netlify-badge, [class*="netlify"], a[href*="netlify.com/?utm"]{ display:none !important; }
+  /* Netlify 무료 플랜 배지 숨김 (엣지 주입 iframe) */
+  #nl-badge-frame, iframe[id*="nl-badge"], iframe[src*="netlify"]{ display:none !important; }
   html,body{min-height:100%;}
   body{
     font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
@@ -485,6 +484,8 @@ function renderQuestion(){
     b.onclick=()=>choose(Q.axis, o.s);
     optsEl.appendChild(b);
   });
+  // 다음 문항 그림 미리 받아두기 (넘길 때 즉시 표시)
+  if(idx+1 < QUESTIONS.length){ const pre=new Image(); pre.src=`assets/q${idx+2}.webp`; }
   window.scrollTo(0,0);
 }
 
@@ -572,6 +573,22 @@ function sendData(typeKey){
 function bumpCount(){ try{ let n=+(localStorage.getItem('safetytest_count')||0)+1; localStorage.setItem('safetytest_count',n); }catch(e){} }
 function loadCount(){ try{ document.getElementById('count').textContent = (+(localStorage.getItem('safetytest_count')||0)).toLocaleString(); }catch(e){} }
 loadCount();
+
+/* 첫 문항 그림 미리 받아두기 (시작 누르면 즉시) */
+(function(){ const pre=new Image(); pre.src='assets/q1.webp'; })();
+
+/* Netlify 배지(엣지 주입 iframe) 제거 — 늦게 붙어도 감시해서 제거 */
+(function(){
+  function killBadge(){
+    document.querySelectorAll('#nl-badge-frame, iframe[id*="nl-badge"], iframe[src*="netlify"]').forEach(function(el){ el.remove(); });
+  }
+  killBadge();
+  try{
+    var mo=new MutationObserver(killBadge);
+    mo.observe(document.documentElement, {childList:true, subtree:true});
+    setTimeout(function(){ mo.disconnect(); }, 15000);
+  }catch(e){}
+})();
 
 /* ================= 공유 (기본형) ================= */
 function copyLink(){ navigator.clipboard?.writeText(location.href).then(()=>alert('링크가 복사됐어요!')); }
