@@ -3,7 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<title>안전 유형 테스트</title>
+<title>안전 유형 테스트 — 해양 동물로 보는 나의 안전 행동 유형은?</title>
+<meta name="description" content="8문항으로 알아보는 나의 바다 안전 행동 유형! 호그워터 안전학교" />
+<!-- 링크 공유 미리보기 (Open Graph) -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="안전 유형 테스트 — 나는 어떤 해양 안전 유형?" />
+<meta property="og:description" content="8문항으로 알아보는 나의 바다 안전 행동 유형! 돌고래·상어·거북이·해파리 중 나는?" />
+<meta property="og:image" content="https://hogwater-safety-school.netlify.app/assets/og.jpg" />
+<meta property="og:url" content="https://hogwater-safety-school.netlify.app/" />
+<meta name="twitter:card" content="summary_large_image" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/static/pretendard.css" />
@@ -569,9 +577,28 @@ function sendData(typeKey){
   bumpCount();
 }
 
-/* 참여자수 (로컬 임시 카운트 — 서버 붙이면 서버값으로 교체) */
-function bumpCount(){ try{ let n=+(localStorage.getItem('safetytest_count')||0)+1; localStorage.setItem('safetytest_count',n); }catch(e){} }
-function loadCount(){ try{ document.getElementById('count').textContent = (+(localStorage.getItem('safetytest_count')||0)).toLocaleString(); }catch(e){} }
+/* 참여자수 — 구글시트에서 실제 수를 JSONP로 불러옴 (DB 없이) */
+function setCountText(n){ try{ document.getElementById('count').textContent = (+n||0).toLocaleString(); }catch(e){} }
+window.__onCount = function(data){
+  if(data && typeof data.count==='number'){
+    setCountText(data.count);
+    try{ localStorage.setItem('safetytest_count', data.count); }catch(e){}
+  }
+};
+function loadCount(){
+  // 먼저 마지막으로 본 값 표시(빠른 표시)
+  try{ setCountText(localStorage.getItem('safetytest_count')||0); }catch(e){}
+  // 서버(구글시트)에서 실제 수 가져오기 (JSONP)
+  if(CONFIG.APPS_SCRIPT_URL){
+    var s=document.createElement('script');
+    s.src=CONFIG.APPS_SCRIPT_URL+'?callback=__onCount&_='+Date.now();
+    s.onerror=function(){}; document.body.appendChild(s);
+    setTimeout(function(){ s.remove&&s.remove(); }, 8000);
+  }
+}
+function bumpCount(){ /* 서버가 실제 수를 세므로 로컬 증가 불필요 (전송 후 재조회) */
+  setTimeout(loadCount, 1500);
+}
 loadCount();
 
 /* 첫 문항 그림 미리 받아두기 (시작 누르면 즉시) */
@@ -590,10 +617,53 @@ loadCount();
   }catch(e){}
 })();
 
-/* ================= 공유 (기본형) ================= */
-function copyLink(){ navigator.clipboard?.writeText(location.href).then(()=>alert('링크가 복사됐어요!')); }
+/* ================= 공유 ================= */
+// 현재 화면에 맞는 공유 URL: 결과 화면이면 ?type=유형 붙임
+function shareUrl(){
+  const base = location.origin + location.pathname;
+  const rs = document.getElementById('screen-result');
+  if(rs && rs.classList.contains('active') && rs.dataset.type){
+    return base + '?type=' + rs.dataset.type;
+  }
+  return base;
+}
+function shareText(){
+  const rs = document.getElementById('screen-result');
+  if(rs && rs.classList.contains('active') && rs.dataset.type){
+    const T = TYPES[rs.dataset.type];
+    return T ? `내 안전 유형은 "${T.title}"! 너도 해봐 🌊` : '안전 유형 테스트 해보기';
+  }
+  return '안전 유형 테스트 — 해양 동물로 보는 나의 안전 행동 유형은?';
+}
+function copyLink(){
+  const url = shareUrl();
+  if(navigator.clipboard){ navigator.clipboard.writeText(url).then(()=>alert('링크가 복사됐어요!')).catch(()=>prompt('아래 링크를 복사하세요', url)); }
+  else{ prompt('아래 링크를 복사하세요', url); }
+}
 function shareKakao(){ alert('카카오톡 공유는 카카오 JS 키 발급 후 연결됩니다. (지금은 링크복사를 사용하세요)'); }
-function shareX(){ const t=encodeURIComponent('안전 유형 테스트 — 위기의 순간, 나의 행동 유형은?'); window.open(`https://twitter.com/intent/tweet?text=${t}&url=${encodeURIComponent(location.href)}`,'_blank'); }
+function shareX(){ window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText())}&url=${encodeURIComponent(shareUrl())}`,'_blank'); }
+
+/* ================= 공유 링크로 들어온 경우: 해당 결과 바로 표시 ================= */
+function showResultByKey(key){
+  const T = TYPES[key]; if(!T) return;
+  document.getElementById('screen-main').classList.remove('active');
+  document.getElementById('screen-quiz').classList.remove('active');
+  const rs = document.getElementById('screen-result');
+  rs.classList.add('active'); rs.dataset.type = key;
+  const hero=document.getElementById('rhero');
+  hero.innerHTML = `<img src="${CONFIG.IMAGES[key]}" alt="${T.title}" onerror="this.style.display='none'"/>`;
+  document.getElementById('rtitle').textContent = T.title;
+  document.getElementById('rquote').textContent = T.quote;
+  document.getElementById('rtags').innerHTML = T.tags.map(t=>`<span>${t}</span>`).join('');
+  document.getElementById('rtraits').innerHTML = T.traits.map(t=>`<li>${t}</li>`).join('');
+  document.getElementById('rcaution').textContent = T.caution;
+  document.getElementById('raction').textContent = T.action;
+  window.scrollTo(0,0);
+}
+(function(){
+  const m = location.search.match(/[?&]type=(dolphin|shark|turtle|jellyfish)/);
+  if(m){ showResultByKey(m[1]); }
+})();
 </script>
 </body>
 </html>
