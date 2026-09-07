@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>안전 유형 테스트</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/static/pretendard.css" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Do+Hyeon&family=Black+Han+Sans&family=Gugi&family=Gamja+Flower&family=Dongle:wght@700&display=swap" />
+<style>
+  @font-face{font-family:'NeoDunggeunmo'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Neodgm.woff') format('woff'); font-display:swap;}
+  :root{
+    --sea:#8fe3ea; --sea-deep:#3aa7b8; --navy:#243a63; --cream:#fdf6e3;
+    --coral:#ff7a6b; --gold:#ffd257; --ink:#2a2f45; --panel:#ffffff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{min-height:100%;}
+  body{
+    font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    background:#ffffff; color:var(--ink);
+    display:flex; justify-content:center; overflow-x:hidden;
+  }
+  #app{
+    width:100%; max-width:430px; min-height:100vh; position:relative;
+    background:#ffffff;
+    padding:20px 18px 40px;
+  }
+  .screen{display:none; animation:fade .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .brand{text-align:center; margin:2px 0 6px;}
+  .brand img{height:20px; display:inline-block; image-rendering:pixelated;
+    background:#fdf6e3; padding:6px 14px; border-radius:14px; box-shadow:0 3px 0 rgba(0,0,0,.20); transform:rotate(-2deg);}
+
+  /* ===== MAIN ===== */
+  .title-wrap{text-align:center; margin:52px 0 18px; position:relative;}
+  .spark{position:absolute; background:#ffd257; filter:drop-shadow(1px 1px 0 #1e2f57);
+    clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);}
+  .spark.s1{top:-8px; left:24px; width:24px; height:24px;}
+  .spark.s2{top:6px; right:22px; width:16px; height:16px; background:#8fe3ea;}
+  .spark.s3{bottom:-6px; left:64px; width:14px; height:14px; background:#c9a3ff;}
+  .title{
+    display:inline-block; font-family:'Jua',sans-serif;
+    font-size:52px; line-height:1.12; letter-spacing:1px; font-weight:400;
+    background:linear-gradient(180deg,#fff3b0 0%,#ffd257 55%,#ffab3a 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    -webkit-text-stroke:3px #1e2f57; paint-order:stroke fill;
+    text-shadow:3px 6px 0 rgba(18,33,63,.35);
+  }
+  .subtitle{text-align:center; margin:0 0 12px; font-family:'Pretendard',sans-serif; font-size:16px; font-weight:700; color:#22345c; line-height:1.7;
+    text-shadow:0 1px 0 rgba(255,255,255,.9), 0 0 6px rgba(255,255,255,.7);}
+  .title-img{display:block; margin:8px auto 0; width:100%; max-width:410px; height:auto;}
+  .subtitle-img{display:block; margin:14px auto 0; width:60%; max-width:240px; height:auto; image-rendering:pixelated;}
+  .tag{
+    display:inline-block; background:var(--gold); color:var(--navy);
+    font-size:17px; font-weight:700; padding:9px 18px; border:3px solid var(--navy);
+    border-radius:20px; margin:5px 0; box-shadow:3px 3px 0 rgba(36,58,99,.2);
+  }
+  .btn{
+    display:block; width:100%; max-width:320px; margin:26px auto 8px;
+    background:linear-gradient(180deg,#ff9d86 0%,#ff6f5c 55%,#e8503c 100%);
+    color:#fff; font-family:'Pretendard',sans-serif; font-weight:800; font-size:22px; letter-spacing:1px;
+    padding:16px 18px; border:4px solid #1e2f57; border-radius:12px; cursor:pointer;
+    box-shadow:inset 0 3px 0 rgba(255,255,255,.45), inset 0 -5px 0 rgba(0,0,0,.18), 5px 6px 0 rgba(18,33,63,.35);
+    text-shadow:2px 2px 0 rgba(0,0,0,.25);
+  }
+  .btn:active{transform:translate(3px,4px); box-shadow:inset 0 3px 0 rgba(255,255,255,.4), inset 0 -4px 0 rgba(0,0,0,.18), 2px 2px 0 rgba(18,33,63,.35);}
+  .btn.secondary{background:linear-gradient(180deg,#ffffff,#eaf4f6); color:#1e2f57; font-size:16px; padding:12px; max-width:260px;
+    box-shadow:inset 0 2px 0 #fff, inset 0 -3px 0 rgba(0,0,0,.08), 3px 4px 0 rgba(18,33,63,.28); text-shadow:none;}
+  .count{text-align:center; font-size:13px; color:var(--navy); margin-top:6px;
+    text-shadow:0 1px 0 rgba(255,255,255,.9), 0 0 6px rgba(255,255,255,.7);}
+  .mascot-slot{
+    height:150px; margin:8px auto; display:flex; align-items:center; justify-content:center; gap:6px;
+    color:var(--navy); font-size:12px; opacity:.5;
+  }
+  .mascot-slot img{height:120px; image-rendering:pixelated;}
+
+  /* ===== MAIN: 네이비 스크랩북 (방구석연구소 시작화면 참고) ===== */
+  #screen-main{ position:relative; }
+  #app:has(#screen-main.active){
+    background-color:#517dff;
+    background-image:
+      linear-gradient(#4973ee 1px, transparent 1px),
+      linear-gradient(90deg, #4973ee 1px, transparent 1px);
+    background-size:26px 26px, 26px 26px;
+  }
+  #screen-main.active{ display:flex; flex-direction:column; justify-content:flex-start; min-height:calc(100vh - 60px); }
+  .spacer{ flex:1 1 auto; min-height:16px; }
+  .spacer-b{ flex-grow:0.7; }
+  /* 상단 로고 바 (방구석 #56 참고) */
+  .topbar{ position:relative; margin:-20px -18px 6px; background:#ffffff; color:#1b3a8f;
+    font-family:'Jua',sans-serif; font-size:18px; letter-spacing:1px; text-align:center;
+    padding:calc(env(safe-area-inset-top, 0px) + 20px) 16px 14px; border-radius:0; box-shadow:0 4px 0 rgba(20,40,120,.10); }
+  .logo-img{ display:block; height:28px; width:auto; margin:0 auto; }
+  .backbtn{ position:absolute; left:8px; bottom:9px; width:36px; height:36px; padding:0; border:none;
+    background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .backbtn svg{ width:22px; height:22px; }
+  #screen-main .btn{ font-family:'Pretendard',sans-serif; font-weight:800; letter-spacing:1px;
+    margin-top:26px; color:#1e2f57; background:#ffd833; border:none; border-radius:14px; text-shadow:none;
+    box-shadow:0 6px 0 rgba(20,40,120,.22), 0 11px 18px rgba(20,40,120,.20); }
+  #screen-main .btn:active{ transform:translateY(3px); box-shadow:0 3px 0 rgba(20,40,120,.22), 0 6px 12px rgba(20,40,120,.20); }
+  #screen-main > .topbar, #screen-main > .title-wrap, #screen-main > .pv-q, #screen-main > .subs, #screen-main > .preview,
+  #screen-main > .btn, #screen-main > .count, #screen-main > .share-start{ position:relative; z-index:1; }
+  #screen-main .count{ color:#ffffff; font-family:'Jua',sans-serif; text-shadow:0 1px 2px rgba(20,40,120,.35); opacity:.95; }
+
+  /* 시작화면 공유 (방구석 참고 · 하단 채움) */
+  .share-start{ text-align:center; margin-top:24px; }
+  .share-start .sl{ color:#eaf1ff; font-family:'Jua',sans-serif; font-size:14px; margin-bottom:10px; opacity:.95; }
+  .share-icons{ display:flex; gap:12px; justify-content:center; }
+  .sic{ width:48px; height:48px; border-radius:50%; border:none; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; box-shadow:0 4px 0 rgba(20,40,120,.22); }
+  .sic:active{ transform:translateY(2px); box-shadow:0 2px 0 rgba(20,40,120,.22); }
+  .sic svg{ width:26px; height:26px; }
+  .sic.talk{ background:#FEE500; } .sic.link{ background:#dbe3f5; }
+
+  /* 4유형 미리보기 (시작화면 가운데) */
+  .preview{ text-align:center; }
+  .pv-q{ text-align:center; color:#eef3ff; font-family:'Jua',sans-serif; font-size:16px; margin:4px 0 0; text-shadow:0 1px 2px rgba(20,40,120,.35); }
+  .pv-row{ display:flex; justify-content:center; align-items:flex-end; gap:4px; }
+  .pv{ display:flex; flex-direction:column; align-items:center; width:24%; }
+  .pv img{ width:100%; max-width:86px; image-rendering:pixelated; animation:floaty 2.4s ease-in-out infinite; }
+  .pv:nth-child(2) img{ animation-delay:.3s; }
+  .pv:nth-child(3) img{ animation-delay:.6s; }
+  .pv:nth-child(4) img{ animation-delay:.9s; }
+  .pv span{ font-family:'Jua',sans-serif; font-size:12px; color:#fff; background:rgba(20,40,120,.32); padding:3px 9px; border-radius:11px; }
+  @keyframes floaty{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+
+  /* 소제목 리본 2줄 (크림 pill · 네이비 위) */
+  .subs{ align-self:center; display:flex; flex-direction:column; align-items:center; gap:9px; margin-top:18px; }
+  .subtitle-ribbon{ font-family:'Jua',sans-serif; font-size:16px; color:#22345c;
+    background:#fdf6e3; padding:8px 20px; border-radius:18px; box-shadow:0 4px 0 rgba(0,0,0,.20); }
+  .subtitle-ribbon:nth-child(odd){ transform:rotate(-1.5deg); }
+  .subtitle-ribbon:nth-child(even){ transform:rotate(1.5deg); }
+
+  /* 배경 낙서 (심플 · 코너 별·점선) */
+  .deco{ position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+  .deco .star{ position:absolute;
+    clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+  .deco .spk{ position:absolute; background:#fff;
+    clip-path:polygon(50% 0,58% 42%,100% 50%,58% 58%,50% 100%,42% 58%,0 50%,42% 42%); }
+  .deco .st1{ top:96px; left:24px; width:20px; height:20px; background:#ffd257; transform:rotate(-12deg); }
+  .deco .st2{ top:150px; right:26px; width:14px; height:14px; background:#8fe3ea; }
+  .deco .k1{ bottom:210px; left:34px; width:15px; height:15px; }
+  .deco .k2{ bottom:170px; right:40px; width:20px; height:20px; }
+  .deco-line{ position:absolute; top:74px; left:16px; width:96px; height:52px; opacity:.6;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='52'%3E%3Cpath d='M4 44 Q 34 6 92 22' stroke='%23ffffff' stroke-width='2.5' fill='none' stroke-dasharray='2 8' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat; }
+
+  /* ===== #23 아케이드 패널 (메인) ===== */
+  .panel{position:relative; text-align:center; background:#fffefb; border:5px solid #1e2f57; border-radius:22px;
+    padding:26px 20px 24px; margin:14px 4px 6px;
+    box-shadow:inset 0 0 0 4px #8fe3ea, 6px 8px 0 rgba(18,33,63,.28);}
+  #screen-main .subtitle{margin:16px 0 0;}
+  /* 픽셀 구름 */
+  .cloud{position:absolute; width:7px; height:7px; background:#fff; z-index:1;
+    box-shadow:7px 0 #fff,14px 0 #fff, -7px 7px #fff,0 7px #fff,7px 7px #fff,14px 7px #fff,21px 7px #fff, 0 -7px #fff,7px -7px #fff;}
+  .cloud.c1{top:74px; left:12px;}
+  .cloud.c2{top:150px; right:16px; transform:scale(1.15);}
+  /* 시작 버튼 + 아케이드 장식 줄 */
+  .start-row{display:flex; align-items:center; justify-content:center; gap:9px; margin:24px 0 8px;}
+  #screen-main .start-row .btn{margin:0; width:auto; max-width:none; flex:0 0 auto; padding:14px 30px; font-size:20px;}
+  .pad{display:flex; gap:7px; flex:0 0 auto;}
+  .arc{width:26px; height:26px; border:3px solid #1e2f57; border-radius:7px;
+    display:inline-flex; align-items:center; justify-content:center; font-size:13px; color:#1e2f57;
+    font-family:'Galmuri11',sans-serif; -webkit-font-smoothing:none; box-shadow:2px 3px 0 rgba(18,33,63,.28);}
+  .arc.c{background:#ff9d86;} .arc.t{background:#8fe3ea;} .arc.g{background:#ffd257;}
+
+  /* ===== QUIZ (방구석 스타일 · 소프트 이모티콘) ===== */
+  /* 퀴즈 화면 배경: 메인과 동일한 블루 그리드 */
+  #app:has(#screen-quiz.active){
+    background-color:#517dff;
+    background-image:
+      linear-gradient(#4973ee 1px, transparent 1px),
+      linear-gradient(90deg, #4973ee 1px, transparent 1px);
+    background-size:26px 26px, 26px 26px;
+  }
+
+  /* 진행바 (얇고 둥글게 + 마커 이동) */
+  .qbar{position:relative; height:34px; margin:8px 2px 20px;}
+  .qbar-track{position:absolute; top:11px; left:0; right:0; height:12px;
+    background:#e6f3f6; border-radius:20px; overflow:hidden; box-shadow:inset 0 1px 2px rgba(58,167,184,.2);}
+  .qbar-fill{height:100%; width:0; transition:width .35s; border-radius:20px; image-rendering:pixelated;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='12' shape-rendering='crispEdges'%3E%3Cg fill='%23ffffff'%3E%3Crect x='0' y='0' width='4' height='2'/%3E%3Crect x='4' y='0' width='4' height='4'/%3E%3Crect x='8' y='0' width='4' height='6'/%3E%3Crect x='12' y='0' width='4' height='4'/%3E%3Crect x='16' y='0' width='4' height='2'/%3E%3Crect x='20' y='0' width='4' height='4'/%3E%3Crect x='24' y='0' width='4' height='6'/%3E%3Crect x='28' y='0' width='4' height='4'/%3E%3C/g%3E%3C/svg%3E") repeat-x left top/32px 12px,
+      linear-gradient(180deg,#a7ecf4 0 40%,#56c3d6 40% 75%,#2f93a8 75% 100%);
+    animation:waveMove 1.3s steps(8) infinite;}
+  @keyframes waveMove{ from{background-position:0 0, 0 0;} to{background-position:32px 0, 0 0;} }
+  .qbar-marker{position:absolute; top:-16px; left:0; width:44px; height:auto; transform:translateX(-50%);
+    transition:left .35s; z-index:2; image-rendering:pixelated; animation:bob 1.8s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(-2px);}}
+
+  /* 번호 원 (뮤트) */
+  .qbadge{width:40px; height:40px; margin:2px auto 16px; border-radius:50%;
+    background:#c6bdac; color:#fff; display:flex; align-items:center; justify-content:center;
+    font-family:'Pretendard',sans-serif; font-size:20px; font-weight:800;}
+
+  /* 질문 (둥근 굵은 고딕, 가운데) */
+  .question{
+    text-align:center; font-family:'Pretendard','Apple SD Gothic Neo',sans-serif; font-weight:800;
+    font-size:22px; line-height:1.5; color:#ffffff; padding:0 6px; margin:10px 0 6px; word-break:keep-all;
+    min-height:66px; display:flex; align-items:center; justify-content:center;
+    text-shadow:0 2px 5px rgba(20,40,120,.35);
+  }
+
+  /* 상황 그림 (가로 장면 카드) */
+  .qillust{position:relative; margin:16px auto 22px; width:100%; aspect-ratio:4/3; border-radius:18px; overflow:hidden;
+    box-shadow:0 8px 18px rgba(20,40,120,.25);}
+  .qillust img{display:block; width:100%; height:100%; object-fit:cover;}
+  .qillust .ph{width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    color:#eaf1ff; font-size:13px; line-height:1.6; text-align:center;
+    border:2px dashed rgba(255,255,255,.55); border-radius:18px; background:rgba(255,255,255,.14);}
+
+  /* 선택지 (흰 pill, 얇은 파스텔 테두리) */
+  .opts{margin-top:6px; display:flex; flex-direction:column; gap:12px; padding-bottom:30px;}
+  .opt{
+    background:#fff; border:none; border-radius:24px;
+    min-height:64px; padding:12px 18px; display:flex; align-items:center; justify-content:center;
+    font-family:'Pretendard',sans-serif; font-size:16px; font-weight:700; line-height:1.4;
+    color:#22345c; text-align:center; cursor:pointer; box-shadow:0 6px 14px rgba(20,40,120,.20);
+  }
+  .opt:active{transform:translateY(2px); box-shadow:0 3px 8px rgba(20,40,120,.22); background:#f4f8ff;}
+
+  /* ===== RESULT (블루 테마) ===== */
+  #app:has(#screen-result.active){
+    background-color:#517dff;
+    background-image:
+      linear-gradient(#4973ee 1px, transparent 1px),
+      linear-gradient(90deg, #4973ee 1px, transparent 1px);
+    background-size:26px 26px, 26px 26px;
+  }
+  .result-card{ background:#fff; border:none; border-radius:22px; padding:0 18px 16px; overflow:hidden;
+    box-shadow:0 12px 26px rgba(20,40,120,.30); margin:20px 8px 0; }
+  .result-hero{ margin:0 -18px 12px; padding:14px 0 10px; text-align:center; position:relative;
+    height:210px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(180deg,#dbebff,#c4ddff); }
+  #screen-result[data-type="dolphin"]   .result-hero{ background:linear-gradient(180deg,#cfe6ff,#aed4ff); }
+  #screen-result[data-type="shark"]     .result-hero{ background:linear-gradient(180deg,#cdeef0,#a9dbe1); }
+  #screen-result[data-type="turtle"]    .result-hero{ background:linear-gradient(180deg,#dcf1d2,#bfe6b3); }
+  #screen-result[data-type="jellyfish"] .result-hero{ background:linear-gradient(180deg,#ffe1ed,#ffc7dc); }
+  .result-hero img{ height:176px; width:auto; max-width:78%; object-fit:contain; image-rendering:pixelated; position:relative; z-index:1; }
+  .result-hero .imgslot{ height:150px; display:flex; align-items:center; justify-content:center; color:#5a76b8; opacity:.6; font-size:12px; }
+  .rtitle{ text-align:center; font-family:'Jua',sans-serif; font-size:22px; color:#1b3a8f; margin:2px 0 5px; }
+  .rquote{ text-align:center; font-size:15px; color:#ff6f5c; font-weight:700; margin-bottom:10px; word-break:keep-all; }
+  .rtags{ text-align:center; margin-bottom:12px; }
+  .rtags span{ display:inline-block; background:#eaf1ff; color:#2f6fe8; font-weight:700; font-size:12px; padding:5px 11px; border-radius:12px; margin:2px; }
+  .rsec{ margin:11px 0; }
+  .rsec h4{ font-size:14px; color:#ff6f5c; margin-bottom:6px; font-weight:800; }
+  .rsec li{ font-size:14px; line-height:1.55; color:#2a2f45; margin-left:4px; list-style:none; padding-left:14px; position:relative; }
+  .rsec li::before{ content:"•"; position:absolute; left:0; color:#2f6fe8; }
+  .rsec p{ font-size:14px; line-height:1.55; color:#2a2f45; }
+  /* 섹션 높이 통일 (유형마다 줄 수 달라도 골격 동일) */
+  #rtraits{ min-height:66px; }
+  #rcaution, #raction{ min-height:44px; }
+  /* 결과 공유 + 다시하기 */
+  .result-share{ text-align:center; margin:30px 0 6px; }
+  .result-share .sl{ color:#ffffff; font-family:'Jua',sans-serif; font-size:14px; margin-bottom:10px; text-shadow:0 1px 2px rgba(20,40,120,.35); }
+  #screen-result .btn{ font-family:'Pretendard',sans-serif; font-weight:800; letter-spacing:1px;
+    color:#1e2f57; background:#ffd833; border:none; border-radius:14px; text-shadow:none; max-width:320px;
+    margin:28px auto 0; box-shadow:0 6px 0 rgba(20,40,120,.22), 0 11px 18px rgba(20,40,120,.20); }
+  #screen-result .btn:active{ transform:translateY(3px); box-shadow:0 3px 0 rgba(20,40,120,.22); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ========== MAIN ========== -->
+  <section id="screen-main" class="screen active">
+    <div class="topbar"><img class="logo-img" src="assets/logo.svg" alt="호그워터 안전학교" /></div>
+
+    <div class="deco">
+      <span class="deco-line"></span>
+      <span class="star st1"></span><span class="star st2"></span>
+      <span class="spk k1"></span><span class="spk k2"></span>
+    </div>
+
+    <div class="title-wrap">
+      <span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span>
+      <img class="title-img" src="assets/title.svg" alt="안전 유형 테스트" />
+    </div>
+    <div class="pv-q">해양 동물로 보는 나의 안전 행동 유형은?</div>
+
+    <div class="spacer"></div>
+
+    <div class="preview">
+      <div class="pv-row">
+        <div class="pv"><img src="assets/dolphin.png" alt="돌고래" /></div>
+        <div class="pv"><img src="assets/shark.png" alt="상어" /></div>
+        <div class="pv"><img src="assets/turtle.png" alt="거북이" /></div>
+        <div class="pv"><img src="assets/jellyfish.png" alt="해파리" /></div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <button class="btn" onclick="startQuiz()">시작하기</button>
+    <div class="count">참여자수 | <span id="count">0</span>명</div>
+
+    <div class="share-start">
+      <div class="sl">테스트 공유하기</div>
+      <div class="share-icons">
+        <button class="sic talk" onclick="shareKakao()" aria-label="카카오톡 공유">
+          <svg viewBox="0 0 24 24"><path fill="#3C1E1E" d="M12 3.6c-4.7 0-8.5 3-8.5 6.7 0 2.4 1.6 4.5 4 5.7l-1 3.6c-.1.3.2.5.5.3l4.2-2.8c.3 0 .5.1.8.1 4.7 0 8.5-3 8.5-6.7S16.7 3.6 12 3.6z"/></svg>
+        </button>
+        <button class="sic link" onclick="copyLink()" aria-label="링크 복사">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1e2f57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5l5-5"/><path d="M10.5 6.5l1-1a3.5 3.5 0 0 1 5 5l-1 1"/><path d="M13.5 17.5l-1 1a3.5 3.5 0 0 1-5-5l1-1"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== QUIZ ========== -->
+  <section id="screen-quiz" class="screen">
+    <div class="topbar">
+      <button class="backbtn" onclick="goBack()" aria-label="뒤로 가기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1b3a8f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <img class="logo-img" src="assets/logo.svg" alt="호그워터 안전학교" />
+    </div>
+    <div class="qbar">
+      <div class="qbar-track"><div class="qbar-fill" id="bar"></div></div>
+      <img class="qbar-marker" id="marker" src="assets/boat.png" alt="" />
+    </div>
+    <div class="question" id="question"></div>
+    <div class="qillust" id="qillust"></div>
+    <div class="opts" id="opts"></div>
+  </section>
+
+  <!-- ========== RESULT ========== -->
+  <section id="screen-result" class="screen">
+    <div class="topbar">
+      <img class="logo-img" src="assets/logo.svg" alt="호그워터 안전학교" />
+    </div>
+    <div class="result-card">
+      <div class="result-hero" id="rhero"></div>
+      <div class="rtitle" id="rtitle"></div>
+      <div class="rquote" id="rquote"></div>
+      <div class="rtags" id="rtags"></div>
+      <div class="rsec"><h4>이런 성향이에요</h4><ul id="rtraits"></ul></div>
+      <div class="rsec"><h4>조심할 점</h4><p id="rcaution"></p></div>
+      <div class="rsec"><h4>추천 안전행동</h4><p id="raction"></p></div>
+    </div>
+    <div class="result-share">
+      <div class="sl">테스트 공유하기</div>
+      <div class="share-icons">
+        <button class="sic talk" onclick="shareKakao()" aria-label="카카오톡 공유">
+          <svg viewBox="0 0 24 24"><path fill="#3C1E1E" d="M12 3.6c-4.7 0-8.5 3-8.5 6.7 0 2.4 1.6 4.5 4 5.7l-1 3.6c-.1.3.2.5.5.3l4.2-2.8c.3 0 .5.1.8.1 4.7 0 8.5-3 8.5-6.7S16.7 3.6 12 3.6z"/></svg>
+        </button>
+        <button class="sic link" onclick="copyLink()" aria-label="링크 복사">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1e2f57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5l5-5"/><path d="M10.5 6.5l1-1a3.5 3.5 0 0 1 5 5l-1 1"/><path d="M13.5 17.5l-1 1a3.5 3.5 0 0 1-5-5l1-1"/></svg>
+        </button>
+      </div>
+    </div>
+    <button class="btn" onclick="location.reload()">다시 하기</button>
+  </section>
+
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const CONFIG = {
+  // 배포 후 Google Apps Script 웹앱 URL을 여기에 붙여넣기
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbw3j8jXEyrdLJdkzpLebJRQzTX6XC33yBMWFJDpRL9uqodU7whLrqQnY8Ht4F5GEwWLEg/exec",
+  // 결과 캐릭터 이미지 (webapp/assets/ 안에 넣기). 개별 PNG로 잘라 저장.
+  IMAGES: {
+    dolphin: "assets/dolphin.png",
+    shark:   "assets/shark.png",
+    turtle:  "assets/turtle.png",
+    jellyfish:"assets/jellyfish.png",
+  },
+};
+
+/* ================= 문항 (축: perc=지각, act=행동 / 점수 3=민감·회피 … 0=둔감·감행) ================= */
+const QUESTIONS = [
+  {axis:'perc', q:`바다 포토스팟에 왔는데, 비 온 뒤라 바닥이 미끌미끌하다!`, opts:[
+    {t:`"여기 미끄럽겠는데?" 발밑부터 살피며 걷는다`, s:3},
+    {t:`"가장자리만 조심하자" 안쪽으로 붙어 걷는다`, s:2},
+    {t:`"별거 있겠어?" 평소대로 걷는다`, s:1},
+    {t:`"뷰 미쳤다!" 사진부터 찍는다`, s:0}]},
+  {axis:'perc', q:`물 빠진 갯벌에서 조개를 캐는데, 물이 슬슬 차오른다!`, opts:[
+    {t:`밀물인 걸 알아채고 시간을 확인한다`, s:3},
+    {t:`물 드는 게 자꾸 신경 쓰인다`, s:2},
+    {t:`아직 발목이라 좀 더 캔다`, s:1},
+    {t:`캐느라 물 차는 줄도 모른다`, s:0}]},
+  {axis:'perc', q:`물놀이하기 딱 좋은 날, 바다도 잔잔하다!`, opts:[
+    {t:`"잔잔해도 속은 모르지" 이안류 있나 살핀다`, s:3},
+    {t:`"안전요원 어디 있지?" 안전선부터 확인한다`, s:2},
+    {t:`"사람도 이렇게 많은데 설마" 대수롭잖게 넘긴다`, s:1},
+    {t:`"물 완전 좋다!" 얼른 뛰어든다`, s:0}]},
+  {axis:'perc', q:`깜깜한 밤, 해안 산책로를 걷는 중이다…`, opts:[
+    {t:`발밑이 안 보여 자꾸 신경 쓰인다`, s:3},
+    {t:`어두운 난간 쪽은 피해 안쪽으로 걷는다`, s:2},
+    {t:`좀 어두워도 평소처럼 걷는다`, s:1},
+    {t:`야경이 예뻐 눈이 자꾸 그리로 간다`, s:0}]},
+  {axis:'act', q:`방파제를 걷는데, 파도가 난간을 훌쩍 넘어온다!`, opts:[
+    {t:`"위험해!" 바로 안전한 곳으로 벗어난다`, s:3},
+    {t:`"일단 지켜보자" 한 발만 물러선다`, s:2},
+    {t:`"오 신기한데?" 사진 몇 장 찍는다`, s:1},
+    {t:`"인생샷각이다!" 파도에 맞춰 찍는다`, s:0}]},
+  {axis:'act', q:`일행이 술 한잔 걸치고 "물 들어가자!" 한다`, opts:[
+    {t:`술 마시고 물은 위험하다고 말린다`, s:3},
+    {t:`나는 안 들어가고 지켜본다`, s:2},
+    {t:`발만 살짝 담가본다`, s:1},
+    {t:`시원하겠다 싶어 같이 들어간다`, s:0}]},
+  {axis:'act', q:`출입금지 표지 너머, 인생샷 명소가 보인다!`, opts:[
+    {t:`"여긴 위험구역이잖아" 선 안에서 찍고 만족한다`, s:3},
+    {t:`"넘어갈까 말까…" 망설이다 안 넘어간다`, s:2},
+    {t:`"딱 한 발만" 얼른 찍고 바로 나온다`, s:1},
+    {t:`"다들 넘어가는데 뭐" 나도 넘어간다`, s:0}]},
+  {axis:'act', q:`갯바위 낚시 가는 날, 구명조끼가 딱 하나뿐이다!`, opts:[
+    {t:`다 같이 입어야지, 인원수대로 챙겨 간다`, s:3},
+    {t:`조끼는 양보하고, 위험한 자리엔 안 간다`, s:2},
+    {t:`그냥 번갈아 입기로 하고 간다`, s:1},
+    {t:`잠깐인데 뭘, 그냥 안 입고 간다`, s:0}]},
+];
+
+/* 보기 표시 순서: 문항별 고정 배열 (점수순 아님 → 위치로 정답 안 드러나게) */
+const DISPLAY_ORDER = [
+  [0,2,1,3],[3,1,2,0],[1,3,0,2],[2,0,3,1],
+  [3,0,1,2],[1,2,0,3],[0,3,2,1],[2,1,3,0],
+];
+
+/* ================= 결과 유형 ================= */
+const TYPES = {
+  dolphin:{ key:'dolphin', title:`바다의 스마트 브레인, 돌고래`, quote:`"돌다리도 최고 속도로 두드려보고 건너요!"`,
+    tags:['#스마트','#신중함','#계획형'],
+    traits:[`매사에 철저하고 계획적인 스타일`,`신호등이 깜빡이면 절대 안 뛰고 다음 신호를 기다림`,`보이스피싱·사기를 귀신같이 알아채고 피하는 지능형 안전 지킴이`],
+    caution:`판단력은 완벽하지만 "늘 가던 곳"에선 잠깐 방심하기 쉬워요.`,
+    action:`익숙한 곳도 처음처럼, 물때·파도·날씨는 갈 때마다 다르니 매번 확인하세요.`,
+    extra:`내가 읽은 위험을 일행에게 먼저 알려주는 '안전 리더' 되기.`},
+  shark:{ key:'shark', title:`바다의 과감한 불도저, 상어`, quote:`"위험한 건 알지만, 내가 컨트롤하면 돼!"`,
+    tags:['#카리스마','#추진력','#자신감'],
+    traits:[`위기 상황을 빠르게 파악하는 능력자`,`"내가 해결할 수 있어!" 하며 과감히 뛰어드는 해결사`,`때로 넘치는 자신감이 위험을 자초하기도 하는 야심가`],
+    caution:`위험을 알면서도 "이 정도쯤이야" 하는 순간, 자신감이 판단을 이길 때가 가장 위험해요.`,
+    action:`뛰어들기 전 딱 3초, 물때·파도·안전표지를 확인하세요. 넘치는 자신감은 구명조끼로 받쳐 주세요.`,
+    extra:``},
+  turtle:{ key:'turtle', title:`평화주의 방어 만렙, 거북이`, quote:`"세상만사 태평하게, 위험하면 숨으면 되지!"`,
+    tags:['#평화주의','#안전제일','#무던함'],
+    traits:[`웬만한 변화·위험엔 "어떻게든 되겠지~" 무던함`,`사소한 위험은 크게 신경 쓰지 않음`,`진짜 위험엔 맞서기보다 자리를 피하는 유유자적 평화주의자`],
+    caution:`미끄러운 바닥이나 들어오는 물때, 잔잔해 보이는 바다처럼 작은 위험 신호를 뒤늦게 알아채기 쉬워요.`,
+    action:`출발 전에 오늘의 물때와 날씨, 안전표지를 미리 확인하세요.`,
+    extra:``},
+  jellyfish:{ key:'jellyfish', title:`인생은 흘러가는 대로, 해파리`, quote:`"인생은 욜로(YOLO)! 흘러가는 조류에 몸을 맡겨요!"`,
+    tags:['#자유영혼','#낙천주의','#아슬아슬'],
+    traits:[`"인생 뭐 있어? 흘러가는 대로!" 초긍정 마이웨이`,`위험 경고판도 무심히 지나침`,`폰 보며 걷다 넘어지기 일쑤, 악의 없이 천하태평한 자유영혼`],
+    caution:`위험을 위험으로 못 느껴 무심코 위험 구역에 들어가기 쉬워요.`,
+    action:`재밌어 보일수록 한 번 의심하고, 안전표지와 일행의 말을 따르세요. 물가에선 구명조끼와 안전선을 꼭 지켜 주세요.`,
+    extra:``},
+};
+
+/* ================= 로직 ================= */
+let order = [];         // 문항 순서 (원하면 고정, 여기선 고정 순서 유지)
+let idx = 0;
+let percSum = 0, actSum = 0;
+const choices = [];     // 문항별 선택 점수 기록 (데이터 수집용)
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function startQuiz(){
+  idx=0; percSum=0; actSum=0; choices.length=0;
+  document.getElementById('screen-main').classList.remove('active');
+  document.getElementById('screen-quiz').classList.add('active');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const Q = QUESTIONS[idx];
+  const pct = ((idx+1)/QUESTIONS.length)*100;
+  document.getElementById('bar').style.width = `${pct}%`;
+  document.getElementById('marker').style.left = `${pct}%`;
+  document.getElementById('question').textContent = Q.q;
+  // 문항별 상황 그림 (assets/q1.png … q8.png). 없으면 자리표시.
+  document.getElementById('qillust').innerHTML =
+    `<img src="assets/q${idx+1}.png" alt="상황 ${idx+1}" `+
+    `onerror="this.parentNode.innerHTML='<div class=&quot;ph&quot;>[ 상황 ${idx+1} 그림 자리 ]</div>'"/>`;
+  const optsEl = document.getElementById('opts');
+  optsEl.innerHTML='';
+  // 보기 순서: 문항별 고정 배열 (점수순 아님)
+  const ord = DISPLAY_ORDER[idx] || [0,1,2,3];
+  ord.forEach(i=>{
+    const o = Q.opts[i];
+    const b=document.createElement('button');
+    b.className='opt'; b.textContent=o.t;
+    b.onclick=()=>choose(Q.axis, o.s);
+    optsEl.appendChild(b);
+  });
+  window.scrollTo(0,0);
+}
+
+function choose(axis, score){
+  if(axis==='perc') percSum+=score; else actSum+=score;
+  choices.push(score);
+  idx++;
+  if(idx < QUESTIONS.length){ renderQuestion(); }
+  else{ showResult(); }
+}
+
+function goBack(){
+  if(idx <= 0){  // 첫 문항 → 메인으로
+    document.getElementById('screen-quiz').classList.remove('active');
+    document.getElementById('screen-main').classList.add('active');
+    window.scrollTo(0,0);
+    return;
+  }
+  idx--;
+  const last = choices.pop();               // 직전 답 되돌리기
+  if(QUESTIONS[idx].axis==='perc') percSum-=last; else actSum-=last;
+  renderQuestion();
+}
+
+function backToQuiz(){  // 결과 → 마지막 문항으로
+  document.getElementById('screen-result').classList.remove('active');
+  document.getElementById('screen-quiz').classList.add('active');
+  idx = QUESTIONS.length - 1;
+  const last = choices.pop();
+  if(QUESTIONS[idx].axis==='perc') percSum-=last; else actSum-=last;
+  renderQuestion();
+  window.scrollTo(0,0);
+}
+
+function decideType(){
+  const perc = percSum>=7 ? 'sens' : 'dull';   // 민감 / 둔감
+  const act  = actSum>=7  ? 'avoid': 'dash';   // 회피 / 감행
+  if(perc==='sens' && act==='avoid') return 'dolphin';
+  if(perc==='sens' && act==='dash')  return 'shark';
+  if(perc==='dull' && act==='avoid') return 'turtle';
+  return 'jellyfish';
+}
+
+function showResult(){
+  document.getElementById('bar').style.width='100%';
+  const mk=document.getElementById('marker'); if(mk) mk.style.left='100%';
+  const key = decideType();
+  const T = TYPES[key];
+  document.getElementById('screen-quiz').classList.remove('active');
+  const rs=document.getElementById('screen-result');
+  rs.classList.add('active');
+  rs.dataset.type = key;
+
+  const hero = document.getElementById('rhero');
+  hero.innerHTML = `<img src="${CONFIG.IMAGES[key]}" alt="${T.title}" onerror="this.style.display='none'; this.parentNode.innerHTML='<div class=&quot;imgslot&quot;>[ ${key} 캐릭터 이미지 자리 ]</div>'"/>`;
+  document.getElementById('rtitle').textContent = T.title;
+  document.getElementById('rquote').textContent = T.quote;
+  document.getElementById('rtags').innerHTML = T.tags.map(t=>`<span>${t}</span>`).join('');
+  document.getElementById('rtraits').innerHTML = T.traits.map(t=>`<li>${t}</li>`).join('');
+  document.getElementById('rcaution').textContent = T.caution;
+  document.getElementById('raction').textContent = T.action;
+
+  sendData(key);
+  window.scrollTo(0,0);
+}
+
+/* ================= 데이터 수집 ================= */
+function sendData(typeKey){
+  const payload = {
+    ts: new Date().toISOString(),
+    q: choices.slice(),        // 문항별 선택 점수
+    perc: percSum, act: actSum,
+    type: typeKey,
+  };
+  // 항상 로컬 백업
+  try{ const k='safetytest_logs'; const arr=JSON.parse(localStorage.getItem(k)||'[]'); arr.push(payload); localStorage.setItem(k, JSON.stringify(arr)); }catch(e){}
+  // 서버 전송 (URL 있으면)
+  if(CONFIG.APPS_SCRIPT_URL){
+    fetch(CONFIG.APPS_SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)}).catch(()=>{});
+  }
+  bumpCount();
+}
+
+/* 참여자수 (로컬 임시 카운트 — 서버 붙이면 서버값으로 교체) */
+function bumpCount(){ try{ let n=+(localStorage.getItem('safetytest_count')||0)+1; localStorage.setItem('safetytest_count',n); }catch(e){} }
+function loadCount(){ try{ document.getElementById('count').textContent = (+(localStorage.getItem('safetytest_count')||0)).toLocaleString(); }catch(e){} }
+loadCount();
+
+/* ================= 공유 (기본형) ================= */
+function copyLink(){ navigator.clipboard?.writeText(location.href).then(()=>alert('링크가 복사됐어요!')); }
+function shareKakao(){ alert('카카오톡 공유는 카카오 JS 키 발급 후 연결됩니다. (지금은 링크복사를 사용하세요)'); }
+function shareX(){ const t=encodeURIComponent('안전 유형 테스트 — 위기의 순간, 나의 행동 유형은?'); window.open(`https://twitter.com/intent/tweet?text=${t}&url=${encodeURIComponent(location.href)}`,'_blank'); }
+</script>
+</body>
+</html>
