@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/static/pretendard.css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap" />
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
 <style>
   :root{
     --sea:#8fe3ea; --sea-deep:#3aa7b8; --navy:#243a63; --cream:#fdf6e3;
@@ -369,6 +370,10 @@
 const CONFIG = {
   // 배포 후 Google Apps Script 웹앱 URL을 여기에 붙여넣기
   APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwL44qwiAjpYFGVnKLfrzbps1GKMxTMgrl0SKkziYAzOevnVIdUKYkardaf9nrVAy39wg/exec",
+  // 카카오 JavaScript 키 (developers.kakao.com > 앱 키). Web 플랫폼에 도메인 등록 필수.
+  KAKAO_JS_KEY: "60069b93d515cebc7b8f5e2ca1a901f8",
+  SITE_URL: "https://hogwater-safety-school.netlify.app/",
+  OG_IMAGE: "https://hogwater-safety-school.netlify.app/assets/og.jpg",
   // 결과 캐릭터 이미지 (webapp/assets/ 안에 넣기). 개별 PNG로 잘라 저장.
   IMAGES: {
     dolphin: "assets/dolphin.webp",
@@ -643,7 +648,38 @@ function copyLink(){
   if(navigator.clipboard){ navigator.clipboard.writeText(url).then(()=>alert('링크가 복사됐어요!')).catch(()=>prompt('아래 링크를 복사하세요', url)); }
   else{ prompt('아래 링크를 복사하세요', url); }
 }
-function shareKakao(){ alert('카카오톡 공유는 카카오 JS 키 발급 후 연결됩니다. (지금은 링크복사를 사용하세요)'); }
+/* 카카오 SDK 초기화 */
+(function(){
+  try{
+    if(window.Kakao && CONFIG.KAKAO_JS_KEY && !Kakao.isInitialized()){
+      Kakao.init(CONFIG.KAKAO_JS_KEY);
+    }
+  }catch(e){}
+})();
+
+function shareKakao(){
+  // SDK 없거나 초기화 실패 시 링크복사로 대체
+  if(!(window.Kakao && Kakao.isInitialized && Kakao.isInitialized())){
+    copyLink(); return;
+  }
+  const rs = document.getElementById('screen-result');
+  const isResult = rs && rs.classList.contains('active') && rs.dataset.type;
+  const T = isResult ? TYPES[rs.dataset.type] : null;
+  const title = T ? `내 안전 유형은 "${T.title}"!` : '안전 유형 테스트';
+  const desc  = T ? '너의 해양 안전 행동 유형도 확인해봐! 🌊' : '해양 동물로 보는 나의 안전 행동 유형은?';
+  try{
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: title,
+        description: desc,
+        imageUrl: CONFIG.OG_IMAGE,
+        link: { mobileWebUrl: shareUrl(), webUrl: shareUrl() },
+      },
+      buttons: [{ title: '테스트 하러 가기', link: { mobileWebUrl: shareUrl(), webUrl: shareUrl() } }],
+    });
+  }catch(e){ copyLink(); }
+}
 function shareX(){ window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText())}&url=${encodeURIComponent(shareUrl())}`,'_blank'); }
 
 /* ================= 공유 링크로 들어온 경우: 해당 결과 바로 표시 ================= */
