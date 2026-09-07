@@ -15,6 +15,8 @@
     --coral:#ff7a6b; --gold:#ffd257; --ink:#2a2f45; --panel:#ffffff;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
+  /* Netlify 무료 플랜 배지 숨김 */
+  .netlify-badge, [class*="netlify"], a[href*="netlify.com/?utm"]{ display:none !important; }
   html,body{min-height:100%;}
   body{
     font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
@@ -283,10 +285,10 @@
 
     <div class="preview">
       <div class="pv-row">
-        <div class="pv"><img src="assets/dolphin.png" alt="돌고래" /></div>
-        <div class="pv"><img src="assets/shark.png" alt="상어" /></div>
-        <div class="pv"><img src="assets/turtle.png" alt="거북이" /></div>
-        <div class="pv"><img src="assets/jellyfish.png" alt="해파리" /></div>
+        <div class="pv"><img src="assets/dolphin.webp" alt="돌고래" /></div>
+        <div class="pv"><img src="assets/shark.webp" alt="상어" /></div>
+        <div class="pv"><img src="assets/turtle.webp" alt="거북이" /></div>
+        <div class="pv"><img src="assets/jellyfish.webp" alt="해파리" /></div>
       </div>
     </div>
 
@@ -318,7 +320,7 @@
     </div>
     <div class="qbar">
       <div class="qbar-track"><div class="qbar-fill" id="bar"></div></div>
-      <img class="qbar-marker" id="marker" src="assets/boat.png" alt="" />
+      <img class="qbar-marker" id="marker" src="assets/boat.webp" alt="" />
     </div>
     <div class="question" id="question"></div>
     <div class="qillust" id="qillust"></div>
@@ -362,10 +364,10 @@ const CONFIG = {
   APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbw3j8jXEyrdLJdkzpLebJRQzTX6XC33yBMWFJDpRL9uqodU7whLrqQnY8Ht4F5GEwWLEg/exec",
   // 결과 캐릭터 이미지 (webapp/assets/ 안에 넣기). 개별 PNG로 잘라 저장.
   IMAGES: {
-    dolphin: "assets/dolphin.png",
-    shark:   "assets/shark.png",
-    turtle:  "assets/turtle.png",
-    jellyfish:"assets/jellyfish.png",
+    dolphin: "assets/dolphin.webp",
+    shark:   "assets/shark.webp",
+    turtle:  "assets/turtle.webp",
+    jellyfish:"assets/jellyfish.webp",
   },
 };
 
@@ -470,7 +472,7 @@ function renderQuestion(){
   document.getElementById('question').textContent = Q.q;
   // 문항별 상황 그림 (assets/q1.png … q8.png). 없으면 자리표시.
   document.getElementById('qillust').innerHTML =
-    `<img src="assets/q${idx+1}.png" alt="상황 ${idx+1}" `+
+    `<img src="assets/q${idx+1}.webp" alt="상황 ${idx+1}" `+
     `onerror="this.parentNode.innerHTML='<div class=&quot;ph&quot;>[ 상황 ${idx+1} 그림 자리 ]</div>'"/>`;
   const optsEl = document.getElementById('opts');
   optsEl.innerHTML='';
